@@ -1,12 +1,14 @@
 import React from 'react'
 
-import CardDisplay from "../Card/Card"
+import Card from "../Card/Card"
 import ButtonDisplay from '../ButtonDisplay/ButtonDisplay'
+
+import './CardProvider.css'
 
 function CardProvider() {
     return (
         <div className="card-provider">
-            <CardDisplay />
+            <Card />
             <ButtonDisplay />
         </div>
     )

@@ -1,7 +1,7 @@
-function CardListItem() {
+function CardListItem(props) {
     return (
         <div className="card-list-item">
-            <p>Card List Item</p>
+            <p>{props.text}</p>
         </div>
     )
 }

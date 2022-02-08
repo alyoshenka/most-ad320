@@ -2,12 +2,14 @@ import React from 'react'
 
 import Button from '../Button/Button'
 
+import './ButtonDisplay.css'
+
 function ButtonDisplay() {
     return (
         <div className="button-display">
-            <Button>Back</Button>
-            <Button>Next</Button>
-            <Button>Next</Button>
+            <Button text="Back" />
+            <Button text="Flip" />
+            <Button text="Next" />
         </div>
     )
 }

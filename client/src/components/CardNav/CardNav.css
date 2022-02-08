@@ -1,9 +1,8 @@
 .card-nav {
-    background-color: cadetblue;
-    width: 10vw;
+    background-color: var(--color-mid);
+    width: 15vw;
     margin-top: 50px;
     margin-left: 50px;
     color: white;
-    padding-top: 20px;
-    padding-bottom: 20px;
+    padding: 20px 15px;
 }

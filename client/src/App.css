@@ -1,3 +1,5 @@
 .container {
     display: flex;
+    display: 75vw;
+    justify-content: space-around;
 }

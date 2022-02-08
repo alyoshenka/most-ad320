@@ -5,7 +5,8 @@ import './Card.css'
 function Card() {
     return (
         <div className="card">
-            <p>card</p>
+            <img src="http://placekitten.com/200/200" alt="dummy image" />
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore.</p>
         </div>
     )
 }

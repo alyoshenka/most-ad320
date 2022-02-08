@@ -10,9 +10,9 @@ function App() {
         <React.Fragment>
             <TopBar />
             <div className="container">
-
-                <CardProvider />
                 <CardNav />
+                <CardProvider />
+
             </div>
         </React.Fragment>
     );
