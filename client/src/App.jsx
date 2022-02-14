@@ -12,7 +12,6 @@ function App() {
             <div className="container">
                 <CardNav />
                 <CardProvider />
-
             </div>
         </React.Fragment>
     );
