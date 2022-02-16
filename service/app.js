@@ -2,8 +2,6 @@ import express from 'express'
 import mongoose from 'mongoose'
 import cors from 'cors'
 
-
-
 import { router } from './routes/router.js'
 
 const app = express()
@@ -37,4 +35,7 @@ app.get('/', (req, res) => {
 })
 
 
-app.listen(port, () => { console.log(`Example app listening on port ${port}`) })
+app.listen(port, () => {
+    console.log(`Example app listening on port ${port}`)
+    console.log(mongoose.connection.readyState === 1 ? "mongoose ready" : "mongoose not ready")
+})

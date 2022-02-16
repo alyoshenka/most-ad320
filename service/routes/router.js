@@ -18,7 +18,7 @@ import {
 } from './routes.js'
 
 router.route('/cards/:id')
-    .get(getCardById) // paginate
+    .get(getCardById)
     .put(updateCardById)
     .delete(deleteCardById)
 
@@ -28,7 +28,7 @@ router.route('/decks/:id')
     .delete(deleteDeckById)
 
 router.route('/decks/:id/cards')
-    .get(getCardsByDeckId)
+    .get(getCardsByDeckId) // paginate
 
 router.route('/users/:id/decks')
     .get(getDecksByUser)
