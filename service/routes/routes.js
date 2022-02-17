@@ -40,7 +40,8 @@ const updateCardById = async(req, res, next) => {
                 card.frontText = data.frontText ? data.frontText : card.frontText
                 card.backImage = data.backImage ? data.backImage : card.backImage
                 card.backText = data.backText ? data.backText : card.backText
-                await card.save()
+                await deck.save()
+                res.sendStatus(204)
             } else {
                 res.status(404).send(`cannot find card ${req.params.id}`)
             }
@@ -65,12 +66,13 @@ const deleteCardById = async(req, res, next) => {
             if (card) {
                 deck.cards.remove(card)
                 deck.size = deck.size - 1
-                await Deck.save()
+                await deck.save()
+                res.sendStatus(204)
             } else {
                 res.status(404).send(`cannot find card ${req.params.id}`)
             }
         } else {
-            req.status(404).send(`cannot find deck ${req.params.id}`)
+            res.status(404).send(`cannot find deck with card ${req.params.id}`)
         }
 
     } catch (err) {
@@ -98,28 +100,52 @@ const getDeckById = async(req, res, next) => {
     }
 }
 
-const updateDeckById = (req, res, next) => {
-    res.send(`updating deck ${req.params.id}`)
+const updateDeckById = async(req, res, next) => {
+    const data = req.body
+    try {
+        const deck = await Deck.findById(req.params.id)
+        if (deck) {
+            deck.name = data.name ? data.name : deck.name
+            deck.cards = data.cards ? data.cards : deck.cards
+            deck.size = deck.cards ? deck.cards.length : 0
+            await deck.save()
+            res.sendStatus(204)
+        } else {
+            res.status(404).send(`cannot find deck associated with card ${req.params.id}`)
+        }
+
+    } catch (err) {
+        res.status(400).send(err.name + err.message)
+    }
 }
 
 const deleteDeckById = async(req, res, next) => {
     try {
         const deck = await Deck.findByIdAndDelete(req.params.id)
-        res.status(204)
+        res.sendStatus(204)
     } catch (err) {
         res.status(502).send(err)
     }
 }
 
-const getDecksByUser = (req, res, next) => {
-    res.send(`getting decks from ${req.params.id}`)
+const getDecksByUser = async(req, res, next) => {
+    try {
+        const decks = await Deck.find({
+            'userId': req.params.id
+        })
+        if (decks) {
+            res.status(200).send(decks)
+        } else {
+            res.status(404).send(`unable to find decks for ${req.params.id}`)
+        }
+    } catch (err) {
+        res.status(502).send(err)
+    }
 }
 
 const createDeck = async(req, res, next) => {
     const deckReq = req.body
 
-    console.log('creating a new deck')
-    console.log(deckReq)
     if (!deckReq.name) {
         res.status(400).send('Deck data incomplete: bad name')
     }
@@ -133,7 +159,7 @@ const createDeck = async(req, res, next) => {
             const deck = new Deck({
                 name: deckReq.name,
                 cards: deckReq.cards,
-                size: deckReq.size,
+                size: 0,
                 userId: deckReq.userId
             })
             await deck.save()
@@ -152,15 +178,16 @@ const createCard = async(req, res, next) => {
 
     if ((!cardReq.frontImage && !cardReq.frontText) ||
         (!cardReq.backImage && !cardReq.backText)) {
-        res.status(400).send('Card data incomplete')
+        console.log(cardReq)
+        return res.status(400).send('Card data incomplete')
     }
 
-    if ((frontImage && !isUrl(frontImage)) || (backImage && !isUrl(backImage))) {
-        res.status(400).send('Image fields must be valid URLs')
+    if ((cardReq.frontImage && !isUrl(cardReq.frontImage)) || (cardReq.backImage && !isUrl(cardReq.backImage))) {
+        return res.status(400).send('Image fields must be valid URLs')
     }
 
     if (!cardReq.deckId) {
-        res.status(400).send('Deck ID is required')
+        return res.status(400).send('Deck ID is required')
     }
 
     try {
@@ -172,6 +199,7 @@ const createCard = async(req, res, next) => {
                 backImage: cardReq.backImage,
                 backText: cardReq.backText
             })
+            deck.size = deck.size + 1
             await deck.save()
             res.sendStatus(204)
         } else { res.sendStatus(404) }
@@ -184,14 +212,14 @@ const createCard = async(req, res, next) => {
 const createUser = async(req, res, next) => {
     const userReq = req.body
 
-    if (!user.firstName || !user.lastName) {
+    if (!userReq.firstName || !userReq.lastName) {
         res.status(400).send('User data incomplete: bad name')
     }
 
     try {
         const user = new User({
-            firstName: req.firstName,
-            lastName: req.lastName
+            firstName: userReq.firstName,
+            lastName: userReq.lastName
         })
         await user.save()
         res.sendStatus(204)
@@ -201,13 +229,27 @@ const createUser = async(req, res, next) => {
     }
 }
 
-const updateUserById = (req, res, next) => {
-    console.log(req.body)
-    res.send(`updating user ${req.params.id}`)
+const updateUserById = async(req, res, next) => {
+    const data = req.body
+
+    const user = await User.findById(req.params.id)
+    if (user) {
+        user.firstName = data.firstName ? data.firstName : user.firstName
+        user.lastName = data.lastName ? data.lastName : user.lastName
+        await user.save()
+        res.sendStatus(204)
+    } else {
+        res.status(404).send(`cannot find user ${req.params.id}`)
+    }
 }
 
-const deleteUserById = (req, res, next) => {
-    res.send(`deleting user ${req.params.id}`)
+const deleteUserById = async(req, res, next) => {
+    try {
+        await User.findByIdAndDelete(req.params.id)
+        res.sendStatus(204)
+    } catch (err) {
+        res.status(502).send(err)
+    }
 }
 
 export {
