@@ -46,5 +46,4 @@ router.route('/users/:id')
     .put(updateUserById)
     .delete(deleteUserById)
 
-// module.exports.router = router;
 export { router }

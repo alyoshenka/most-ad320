@@ -34,12 +34,12 @@ const updateCardById = async(req, res, next) => {
             'cards._id': req.params.id
         })
         if (deck) {
-            const card = deck.cards.find(card => card._id = req.params.id)
+            const card = deck.cards.id(req.params.id)
             if (card) {
-                card.frontImage = data.frontImage ? data.frontImage : card.frontImage
-                card.frontText = data.frontText ? data.frontText : card.frontText
-                card.backImage = data.backImage ? data.backImage : card.backImage
-                card.backText = data.backText ? data.backText : card.backText
+                card.frontImage = data.frontImage ?? card.frontImage
+                card.frontText = data.frontText ?? card.frontText
+                card.backImage = data.backImage ?? card.backImage
+                card.backText = data.backText ?? card.backText
                 await deck.save()
                 res.sendStatus(204)
             } else {
@@ -74,11 +74,9 @@ const deleteCardById = async(req, res, next) => {
         } else {
             res.status(404).send(`cannot find deck with card ${req.params.id}`)
         }
-
     } catch (err) {
         res.status(400).send(err.name + err.message)
     }
-
 }
 
 const getCardsByDeckId = async(req, res, next) => {

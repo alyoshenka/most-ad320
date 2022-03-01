@@ -22,18 +22,12 @@ const exampleMiddleware = (req, res, next) => {
 
 app.use(cors())
 app.use(express.json())
-app.use(exampleMiddleware)
 
-
-// routes
-
-// mount router
 app.use('/', router)
 
 app.get('/', (req, res) => {
     res.send('hello world')
 })
-
 
 app.listen(port, () => {
     console.log(`Example app listening on port ${port}`)
