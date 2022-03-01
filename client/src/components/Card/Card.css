@@ -1,0 +1,16 @@
+.card {
+    background-color: var(--color-lm);
+    display: flex;
+}
+
+
+/*.card>img*/
+
+.card>img {
+    margin: 15px;
+}
+
+.card>p {
+    margin: 15px;
+    color: white;
+}
