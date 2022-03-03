@@ -2,11 +2,9 @@ import React, {useEffect, useState} from "react"
 import { Button, Stack, TextField, FormHelperText, Alert, AlertTitle } from "@mui/material"
 import axios from 'axios'
 
-// time in lecture recording: 1:51:13
-
 const CreateFlashcard = ({ userId, deckId }) => {
   // how can we use state here to make sure we're validating info
-  // console.log(`[CreateFlashcard] deckId is ${deckId}`)
+  console.log(`[CreateFlashcard] deckId is ${deckId}`)
   const [formValue, setFormValue] = useState({})
   const [errors, setErrors] = useState({
     frontText: false,
@@ -24,8 +22,6 @@ const CreateFlashcard = ({ userId, deckId }) => {
     alertBody: 'nothing submitted'
   })
 
-  // enable/disable submit button it fields not validated??
-
   function validateProperty(fieldName, fieldValue) { 
     const helper = fieldName + "Helper"
     if (fieldValue === '') {
@@ -40,7 +36,7 @@ const CreateFlashcard = ({ userId, deckId }) => {
 
   const handleChange = (event) => {
     event.preventDefault()
-    // console.log("[CreateFlashcard] onChange ", event)
+    console.log("[CreateFlashcard] onChange ", event)
     validateProperty(event.target.name, event.target.value)
 
     const currentValues = formValue
