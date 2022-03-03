@@ -9,10 +9,15 @@ const CreateFlashcard = ({ userId, deckId }) => {
   // console.log(`[CreateFlashcard] deckId is ${deckId}`)
   const [formValue, setFormValue] = useState({})
   const [errors, setErrors] = useState({
-    'frontText': false,
-    'frontImage': false,
-    'backText': false,
-    'backImage': false
+    frontText: false,
+    frontImage: false,
+    backText: false,
+    backImage: false/*,
+    frontTextHelper: '',
+    frontImageHelper: '',
+    backTextHelper: '',
+    backImageHelper: ''
+    */
   })
 
   useEffect(() => {
@@ -22,30 +27,25 @@ const CreateFlashcard = ({ userId, deckId }) => {
 
   // enable/disable submit button it fields not validated??
 
-  function validateProperty(fieldName, fieldValue) { // returns boolean
-    if (fieldValue.trim() === '') { return false }
-    
-    return true
+  function validateProperty(fieldName, fieldValue) { 
+    if (fieldValue.trim() === '') { 
+      // can these be combined to one line??
+      setErrors({...errors, [fieldName]: true })
+      // setErrors({...errors, [fieldName+"Helper"]: 'whitespace'})
+    } else {
+      setErrors({ ...errors, [fieldName]: false })
+      // setErrors({...errors, [fieldName+"Helper"]: ''})
+     }
   }
 
   const handleChange = (event) => {
     event.preventDefault()
     // console.log("[CreateFlashcard] onChange ", event)
+    validateProperty(event.target.name, event.target.value)
 
-    const newErrors = errors;
-    if (validateProperty(event.target.name, event.target.value)) {
-      const currentValues = formValue
-      currentValues[event.target.name] = event.target.value // event.target.name = name in form TextField
-      setFormValue(currentValues)
-      console.log('form value changed')
-
-      newErrors[event.target.name] = false
-    } else {
-      newErrors[event.target.name] = true      
-    }
-    // 'errors' gets changed here, any time the input changes
-    setErrors(newErrors)  
-    console.log('errors')
+    const currentValues = formValue
+    currentValues[event.target.name] = event.target.value // event.target.name = name in form TextField
+    setFormValue(currentValues)
   }
   
   const handleSubmit = async (event) => {
@@ -82,6 +82,7 @@ const CreateFlashcard = ({ userId, deckId }) => {
         id="frontText"
         onChange={handleChange}
         error={errors.frontText}
+        // helperText={errors.frontTextHelper}
       />
       <TextField
         margin="normal"
