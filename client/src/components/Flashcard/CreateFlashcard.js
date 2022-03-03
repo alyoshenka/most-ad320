@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react"
-import { Button, Stack, TextField } from "@mui/material"
+import { Button, Stack, TextField, FormHelperText } from "@mui/material"
 import axios from 'axios'
 
 // time in lecture recording: 1:51:13
@@ -12,30 +12,25 @@ const CreateFlashcard = ({ userId, deckId }) => {
     frontText: false,
     frontImage: false,
     backText: false,
-    backImage: false/*,
+    backImage: false,
     frontTextHelper: '',
     frontImageHelper: '',
     backTextHelper: '',
     backImageHelper: ''
-    */
   })
-
-  useEffect(() => {
-    // this should run every time 'errors' is changed
-    console.log('effect')
-   }, [errors])
 
   // enable/disable submit button it fields not validated??
 
   function validateProperty(fieldName, fieldValue) { 
-    if (fieldValue.trim() === '') { 
-      // can these be combined to one line??
-      setErrors({...errors, [fieldName]: true })
-      // setErrors({...errors, [fieldName+"Helper"]: 'whitespace'})
+    const helper = fieldName + "Helper"
+    if (fieldValue === '') {
+      setErrors({ ...errors, [fieldName]: true, [helper]: "empty field" })
+    }
+    else if (fieldValue.trim() === '') { 
+      setErrors({ ...errors, [fieldName]: true, [helper]: "whitespace" })
     } else {
-      setErrors({ ...errors, [fieldName]: false })
-      // setErrors({...errors, [fieldName+"Helper"]: ''})
-     }
+      setErrors({ ...errors, [fieldName]: false, [helper]: "" })
+    }
   }
 
   const handleChange = (event) => {
@@ -72,6 +67,7 @@ const CreateFlashcard = ({ userId, deckId }) => {
         onChange={handleChange}
         autoFocus
         error={errors.frontImage}
+        helperText={errors.frontImageHelper}
       />
       <TextField
         margin="normal"
@@ -82,7 +78,7 @@ const CreateFlashcard = ({ userId, deckId }) => {
         id="frontText"
         onChange={handleChange}
         error={errors.frontText}
-        // helperText={errors.frontTextHelper}
+        helperText={errors.frontTextHelper}
       />
       <TextField
         margin="normal"
@@ -93,6 +89,7 @@ const CreateFlashcard = ({ userId, deckId }) => {
         name="backImage"
         onChange={handleChange}
         error={errors.backImage}
+        helperText={errors.backImageHelper}
       />
       <TextField
         margin="normal"
@@ -103,6 +100,7 @@ const CreateFlashcard = ({ userId, deckId }) => {
         id="backText"
         onChange={handleChange}
         error={errors.backText}
+        helperText={errors.backTextHelper}
       />
       <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
         Submit
