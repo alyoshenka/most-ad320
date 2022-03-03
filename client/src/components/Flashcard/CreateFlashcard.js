@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react"
-import { Button, Stack, TextField, FormHelperText } from "@mui/material"
+import { Button, Stack, TextField, FormHelperText, Alert, AlertTitle } from "@mui/material"
 import axios from 'axios'
 
 // time in lecture recording: 1:51:13
@@ -17,6 +17,11 @@ const CreateFlashcard = ({ userId, deckId }) => {
     frontImageHelper: '',
     backTextHelper: '',
     backImageHelper: ''
+  })
+  const [submissionResponse, setSubmissionResponse] = useState({
+    alertTitle: 'Submission Status',
+    alertSeverity: 'info',
+    alertBody: 'nothing submitted'
   })
 
   // enable/disable submit button it fields not validated??
@@ -48,9 +53,19 @@ const CreateFlashcard = ({ userId, deckId }) => {
     event.preventDefault()
     try {
       const response = await axios.post(`http://localhost:8000/decks/${deckId}/cards`, formValue, { headers: { user: userId } })
-      console.log(`[createflashcard] response submit ${response.status}`)
+      setSubmissionResponse({
+        ...submissionResponse,
+        ['alertTitle']: `${response.status}`,
+        ['alertSeverity']: 'success',
+        ['alertBody']: response.body ?? ''
+      })
     } catch (err) {
-      console.log(`response error ${err.status}`)
+      setSubmissionResponse({
+        ...submissionResponse,
+        ['alertTitle']: `Status code ${err.response.status}`,
+        ['alertSeverity']: 'error',
+        ['alertBody']: `${err.response.data}`
+      })
     }
   }
 
@@ -105,6 +120,10 @@ const CreateFlashcard = ({ userId, deckId }) => {
       <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
         Submit
       </Button>
+      <Alert severity={submissionResponse.alertSeverity}>
+        <AlertTitle>{submissionResponse.alertTitle}</AlertTitle>
+        {submissionResponse.alertBody}
+      </Alert>
     </Stack>
   )
 }
