@@ -9,7 +9,9 @@ import {
     createDeck,
     createCard,
     deleteDeck,
-    updateDeck
+    updateDeck,
+
+    checkValidator
 } from './handlers/decks.js'
 
 import {
@@ -53,7 +55,11 @@ app.delete('/decks/:id', deleteDeck)
 app.post(
     '/decks/:id/cards',
     body('frontImage').isURL(),
-    body('frontText').not().isEmpty(),
+    body('backImage').isURL(),
+    body('frontText').trim().not().isEmpty(),
+    body('backText').trim().not().isEmpty(),
+    body('frontText').custom(value => value !== '_validatorError'),
+    checkValidator,
     createCard
 )
 
