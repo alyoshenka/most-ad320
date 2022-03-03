@@ -1,6 +1,11 @@
-import React, {useEffect, useState} from "react"
-import { Button, Stack, TextField, FormHelperText, Alert, AlertTitle } from "@mui/material"
+import React, {useState} from "react"
+import { Button, Stack, TextField, Alert, AlertTitle } from "@mui/material"
 import axios from 'axios'
+
+const isUrl = (value) => {
+  const re = /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)/
+  return re.test(value)
+}
 
 const CreateFlashcard = ({ userId, deckId }) => {
   // how can we use state here to make sure we're validating info
@@ -27,8 +32,11 @@ const CreateFlashcard = ({ userId, deckId }) => {
     if (fieldValue === '') {
       setErrors({ ...errors, [fieldName]: true, [helper]: "empty field" })
     }
-    else if (fieldValue.trim() === '') { 
-      setErrors({ ...errors, [fieldName]: true, [helper]: "whitespace" })
+    else if (fieldValue.trim() === '') {
+      setErrors({ ...errors, [fieldName]: true, [helper]: "only whitespace" })
+    }
+    else if (fieldName.endsWith('Image') && !isUrl(fieldValue)) {
+      setErrors({ ...errors, [fieldName]: true, [helper]: "invalid url" })
     } else {
       setErrors({ ...errors, [fieldName]: false, [helper]: "" })
     }
@@ -51,16 +59,16 @@ const CreateFlashcard = ({ userId, deckId }) => {
       const response = await axios.post(`http://localhost:8000/decks/${deckId}/cards`, formValue, { headers: { user: userId } })
       setSubmissionResponse({
         ...submissionResponse,
-        ['alertTitle']: `${response.status}`,
-        ['alertSeverity']: 'success',
-        ['alertBody']: response.body ?? ''
+        'alertTitle': `${response.status}: submission succeeded`,
+        'alertSeverity': 'success',
+        'alertBody': response.body ?? ''
       })
     } catch (err) {
       setSubmissionResponse({
         ...submissionResponse,
-        ['alertTitle']: `Status code ${err.response.status}`,
-        ['alertSeverity']: 'error',
-        ['alertBody']: `${err.response.data}`
+        'alertTitle': `${err.response.status}: submission failed`,
+        'alertSeverity': 'error',
+        'alertBody': err.response.data ?? ''
       })
     }
   }
