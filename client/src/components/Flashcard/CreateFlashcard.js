@@ -16,8 +16,9 @@ const CreateFlashcard = ({ userId, deckId }) => {
   })
 
   useEffect(() => {
+    // this should run every time 'errors' is changed
     console.log('effect')
-   }, [formValue])
+   }, [errors])
 
   // enable/disable submit button it fields not validated??
 
@@ -36,12 +37,15 @@ const CreateFlashcard = ({ userId, deckId }) => {
       const currentValues = formValue
       currentValues[event.target.name] = event.target.value // event.target.name = name in form TextField
       setFormValue(currentValues)
+      console.log('form value changed')
 
       newErrors[event.target.name] = false
     } else {
       newErrors[event.target.name] = true      
     }
-    setErrors(newErrors)   
+    // 'errors' gets changed here, any time the input changes
+    setErrors(newErrors)  
+    console.log('errors')
   }
   
   const handleSubmit = async (event) => {
