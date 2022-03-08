@@ -1,15 +1,10 @@
 import React, {useState} from "react"
 import { Button, Stack, TextField, Alert, AlertTitle } from "@mui/material"
+import runValidation from '../../validation/validation.js'
 import axios from 'axios'
 
-const isUrl = (value) => {
-  const re = /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=\+\$,\w]+@)?[A-Za-z0-9.-]+|(?:www.|[-;:&=\+\$,\w]+@)[A-Za-z0-9.-]+)((?:\/[\+~%\/.\w-_]*)?\??(?:[-\+=&;%@.\w_]*)#?(?:[\w]*))?)/
-  return re.test(value)
-}
 
 const CreateFlashcard = ({ userId, deckId }) => {
-  // how can we use state here to make sure we're validating info
-  console.log(`[CreateFlashcard] deckId is ${deckId}`)
   const [formValue, setFormValue] = useState({})
   const [errors, setErrors] = useState({
     frontText: false,
@@ -29,17 +24,9 @@ const CreateFlashcard = ({ userId, deckId }) => {
 
   function validateProperty(fieldName, fieldValue) { 
     const helper = fieldName + "Helper"
-    if (fieldValue === '') {
-      setErrors({ ...errors, [fieldName]: true, [helper]: "empty field" })
-    }
-    else if (fieldValue.trim() === '') {
-      setErrors({ ...errors, [fieldName]: true, [helper]: "only whitespace" })
-    }
-    else if (fieldName.endsWith('Image') && !isUrl(fieldValue)) {
-      setErrors({ ...errors, [fieldName]: true, [helper]: "invalid url" })
-    } else {
-      setErrors({ ...errors, [fieldName]: false, [helper]: "" })
-    }
+
+    const validationResult = runValidation(fieldName, fieldValue)
+    setErrors({ ...errors, [fieldName]: validationResult != null, [helper]: validationResult })
   }
 
   const handleChange = (event) => {
@@ -48,26 +35,31 @@ const CreateFlashcard = ({ userId, deckId }) => {
     validateProperty(event.target.name, event.target.value)
 
     const currentValues = formValue
-    currentValues[event.target.name] = event.target.value // event.target.name = name in form TextField
+    currentValues[event.target.name] = event.target.value
     setFormValue(currentValues)
   }
   
   const handleSubmit = async (event) => {
     console.log("[CreateFlashcard] onSubmit ", event)
     event.preventDefault()
+
+    const successTitle = 'Card added'
+    const successSeverity = 'success'
+    const failureTitle = 'Card rejected'
+    const failureSeverity = 'error'
     try {
       const response = await axios.post(`http://localhost:8000/decks/${deckId}/cards`, formValue, { headers: { user: userId } })
       setSubmissionResponse({
         ...submissionResponse,
-        'alertTitle': `${response.status}: submission succeeded`,
-        'alertSeverity': 'success',
+        'alertTitle': successTitle,
+        'alertSeverity': successSeverity,
         'alertBody': response.body ?? ''
       })
     } catch (err) {
       setSubmissionResponse({
         ...submissionResponse,
-        'alertTitle': `${err.response.status}: submission failed`,
-        'alertSeverity': 'error',
+        'alertTitle': failureTitle,
+        'alertSeverity': failureSeverity,
         'alertBody': err.response.data ?? ''
       })
     }
