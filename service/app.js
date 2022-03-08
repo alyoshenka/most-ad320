@@ -58,6 +58,7 @@ app.post(
     body('backImage').isURL(),
     body('frontText').trim().not().isEmpty(),
     body('backText').trim().not().isEmpty(),
+    // test express-validator on the server side; show behavior for a "bad" submission
     body('frontText').custom(value => value !== '_validatorError'),
     checkValidator,
     createCard

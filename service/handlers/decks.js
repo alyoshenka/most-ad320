@@ -74,6 +74,8 @@ export const createCard = async(req, res) => {
         deck.cards.push(newCard)
         await user.save()
         const newId = deck.cards[deck.cards.length - 1]
+
+        // demonstrate the behavior for an "incorrect" submission to the server
         if (newCard['frontText'] === '_serverError') {
             res.status(418).send('Server was successful in returning an error')
         } else {
