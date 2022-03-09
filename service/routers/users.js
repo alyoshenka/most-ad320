@@ -3,9 +3,27 @@ import { User } from '../models/User.js'
 
 const usersRouter = Router()
 
+function sanitizeUsers(user) {
+  const sanitizedUsers = users.map((user) => ({
+    id: user._id,
+    firstName: user.firstName,
+    lastName: user.lastName,
+    email: user.email,
+    decks: user.decks,
+    active: user.active
+  }))
+  return sanitizeUsers
+}
+
 const getUsers = async (req, res) => {
-  const users = await User.find({})
-  res.send(users)
+  const { userId } = req.user
+  const requestor = await User.findById(userId)
+  if (requestor.role === 'admin' || requestor.role === 'superuser') {
+    const users = await User.find({})
+    res.send(sanitizeUsers(users))
+  } else {
+    res.status(403).send('Forbidden')
+  }  
 }
 
 const getUsersById = async (req, res) => {
