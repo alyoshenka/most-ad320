@@ -4,11 +4,14 @@ import { User } from '../models/User.js'
 
 const decksRouter = Router()
 
+// todo: take out extraneous console.logs
+
 const getDecks = async (req, res) => {
   const { userId, other } = req.user
   console.log(`Other data from the token ${other}`)
   try {
     const user = await User.findById(userId)
+    console.log(user)
     if (user) {
       res.send(user.decks)
     } else {

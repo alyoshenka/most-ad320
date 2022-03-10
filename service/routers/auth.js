@@ -78,6 +78,10 @@ authRouter.post('/register', register)
 export default authRouter
 
 export const verifyToken = async (req, res, next) => {
+  if (!req.headers.authorization) {
+    res.status(401).send('No authentication information provided')
+  }
+
   const authParts = req.headers.authorization.split(' ')
   if (authParts[0] !== 'Bearer' || authParts.length < 2) {
     res.status(400).send('Bad authentication token')

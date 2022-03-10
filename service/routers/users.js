@@ -1,34 +1,34 @@
 import { Router } from 'express'
 import { User } from '../models/User.js'
+import {
+  sanitizeUser,
+  sanitizeUsers,
+  isAdmin,
+  isSuperuser,
+  isUser
+} from '../authorization/authorization.js'
 
 const usersRouter = Router()
 
-function sanitizeUsers(user) {
-  const sanitizedUsers = users.map((user) => ({
-    id: user._id,
-    firstName: user.firstName,
-    lastName: user.lastName,
-    email: user.email,
-    decks: user.decks,
-    active: user.active
-  }))
-  return sanitizeUsers
-}
 
 const getUsers = async (req, res) => {
-  const { userId } = req.user
-  const requestor = await User.findById(userId)
-  if (requestor.role === 'admin' || requestor.role === 'superuser') {
+  try {
     const users = await User.find({})
     res.send(sanitizeUsers(users))
-  } else {
-    res.status(403).send('Forbidden')
+  } catch (err) {
+    console.log(`Error getting users: ${err}`)
+    res.sendStatus(500)
   }  
 }
 
 const getUsersById = async (req, res) => {
-  const user = await User.findById(req.params.id)
-  res.send(user)
+  try {
+    const user = await User.findById(req.params.id)
+    res.send(sanitizeUser(user))
+  } catch (err) {
+    console.log(`Error getting user by id: ${err}`)
+    res.sendStatus(500) // todo: correct status code?
+  }
 }
 
 const updateUser = async (req, res) => {
@@ -43,9 +43,9 @@ const deleteUser = async (req, res) => {
   res.sendStatus(503)
 }
 
-usersRouter.get('/', getUsers)
-usersRouter.get('/:id', getUsersById)
-usersRouter.put('/:id', updateUser)
-usersRouter.delete('/:id', deleteUser)
+usersRouter.get('/', isSuperuser, getUsers) 
+usersRouter.get('/:id', isSuperuser, getUsersById)
+usersRouter.put('/:id', updateUser) // todo: check route
+usersRouter.delete('/:id', deleteUser) // todo: check route
 
 export default usersRouter
