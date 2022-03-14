@@ -72,8 +72,8 @@ async function login(req, res) {
   }
 }
 
-authRouter.post('/login', login)
-authRouter.post('/register', register)
+authRouter.post('/login', login) // todo: check route
+authRouter.post('/register', register) // todo: check route
 
 export default authRouter
 

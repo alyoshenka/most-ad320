@@ -5,7 +5,7 @@ import {
   sanitizeUsers,
   isAdmin,
   isSuperuser,
-  isUser
+  isAdminOrSuperItself
 } from '../authorization/authorization.js'
 
 const usersRouter = Router()
@@ -45,7 +45,7 @@ const deleteUser = async (req, res) => {
 
 usersRouter.get('/', isSuperuser, getUsers) 
 usersRouter.get('/:id', isSuperuser, getUsersById)
-usersRouter.put('/:id', updateUser) // todo: check route
-usersRouter.delete('/:id', deleteUser) // todo: check route
+usersRouter.put('/:id', isAdminOrSuperItself, updateUser)
+usersRouter.delete('/:id', isAdminOrSuperItself, deleteUser)
 
 export default usersRouter

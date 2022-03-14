@@ -1,5 +1,5 @@
 import { User } from '../models/User.js'
-import assert from 'assert'
+
 
 export function sanitizeUser(user) {
   return {
@@ -16,7 +16,7 @@ export function sanitizeUsers(users) {
   return users.map((user) => sanitizeUser(user))
 }
 
-function atOrAboveRole(myRole, roleToCheckAgainst) {
+export function atOrAboveRole(myRole, roleToCheckAgainst) {
     if (myRole === roleToCheckAgainst) {
         return true
     } else if (roleToCheckAgainst === 'user') {
@@ -27,25 +27,6 @@ function atOrAboveRole(myRole, roleToCheckAgainst) {
         return false
     }
 }
-
-// Note: assertions are not desirable in production code.
-// In this case, they are included to verify that role
-// permissions are handled correctly
-// Ideally, where would these be placed?
-// todo: look into ^
-assert(atOrAboveRole('user', 'user'))
-assert(atOrAboveRole('superuser', 'superuser'))
-assert(atOrAboveRole('admin', 'admin'))
-assert(atOrAboveRole('superuser', 'user'))
-assert(atOrAboveRole('admin', 'user'))
-assert(atOrAboveRole('admin', 'superuser'))
-
-assert(!atOrAboveRole(null, 'user'))
-assert(!atOrAboveRole(null, 'superuser'))
-assert(!atOrAboveRole(null, 'admin'))
-assert(!atOrAboveRole('user', 'superuser'))
-assert(!atOrAboveRole('user', 'admin'))
-assert(!atOrAboveRole('superuser', 'admin'))
 
 // todo: simplify code
 
@@ -97,6 +78,84 @@ export async function isUser(req, res, next) {
     }
 }
 
-export async function userTryingToUpdateItself(req, res, next) {
-    // intended for superuser behavior
+export async function isAdminOrSuperItself(req, res, next) { 
+    const { userId } = req.user
+    const toDeleteId = req.params.id
+    if (!userId) {
+        console.log('no userId')
+        res.sendStatus(500) // todo: error code?
+    }
+    if (!toDeleteId) {
+        console.log('no id parameter')
+        res.sendStatus(500) // todo: correct error code?
+    }
+    try {
+        const requestor = await User.findById(userId)
+        const role = requestor.role[0]
+        if (atOrAboveRole(role, 'admin')) {
+            next()
+        } else if (atOrAboveRole(role, 'superuser') && userId === toDeleteId) {
+            next()
+        } else {
+            res.status(403).send('Forbidden')
+        }
+    } catch (err) {
+        console.log(`Error deleting user: ${err}`)
+        console.sendStatus(500) // todo: error code
+    }
+}
+
+// todo: redundancy here
+
+export async function isSuperOrUserItself(req, res, next) {
+    const { userId } = req.user
+    const paramId = req.params.id
+    if (!userId) {
+        console.log('no userId')
+        res.sendStatus(500) // todo: error code?
+    }
+    if (!paramId) {
+        console.log('no id parameter')
+        res.sendStatus(500) // todo: correct error code?
+    }
+    try {
+        const requestor = await User.findById(userId)
+        const role = requestor.role[0]
+        console.log(role)
+        console.log(userId)
+        console.log('check: ' + req.idCheck)
+        if (atOrAboveRole(role, 'superuser')) {
+            // next()
+            res.sendStatus(200)
+        } else if (atOrAboveRole(role, 'user') && userId === paramId) {
+            // next()
+            res.sendStatus(200)
+        } else {
+            res.status(403).send('Forbidden')
+        }
+    } catch (err) {
+        console.log(`Error checking user: ${err}`)
+        console.sendStatus(500) // todo: error code
+    }
+}
+
+export async function deckIdBelongsToUser(req, res, next) {
+
+}
+
+// I kind of like this one, it seems more extensible when dealing with users, decks, and cards
+export async function addIdToCheckParameter(req, res, next) {
+
+}
+export async function addIdParamCard(req, res, next) {
+    
+}
+export async function addIdParamDeck(req, res, next) {
+
+}
+export async function addIdParamUser(req, res, next) { 
+    const { userId } = req.user
+    const paramId = req.params.id
+    req.idCheck = paramId
+    next()
 }

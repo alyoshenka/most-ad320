@@ -1,6 +1,10 @@
 import { Router } from 'express'
 import { body } from 'express-validator'
 import { User } from '../models/User.js'
+import {
+  isSuperOrUserItself,
+  addIdParamUser
+} from '../authorization/authorization.js'
 
 const decksRouter = Router()
 
@@ -24,7 +28,7 @@ const getDecks = async (req, res) => {
 }
 
 const createDeck = async (req, res) => {
-  const userId = ''
+  const { userId } = req.user
   const newDeck = req.body
   try {
     const user = await User.findById(userId)
@@ -41,7 +45,7 @@ const createDeck = async (req, res) => {
 }
 
 const createCard = async (req, res) => {
-  const userId = ''
+  const { userId } = req.user
   const deckId = req.params.id
   const newCard = req.body
   try {
@@ -58,7 +62,7 @@ const createCard = async (req, res) => {
 }
 
 const deleteDeck = async (req, res) => {
-  const userId = ''
+  const { userId } = req.user
   const deckId = req.params.id
   try {
     const user = await User.findById(userId)
@@ -73,9 +77,10 @@ const deleteDeck = async (req, res) => {
 }
 
 const updateDeck = async (req, res) => {
-  const userId = ''
+  const { userId } = req.user
   const deckId = req.params.id
   const newDeck = req.body
+  console.log(req.params)
   try {
     const user = await User.findById(userId)
     const deck = user.decks.id(deckId)
@@ -88,14 +93,19 @@ const updateDeck = async (req, res) => {
   }
 }
 
-decksRouter.get('/', getDecks)
-decksRouter.post('/', body('name').not().isEmpty(), createDeck)
+decksRouter.get('/', getDecks) // todo: check route
+decksRouter.post('/', body('name').not().isEmpty(), createDeck) // todo: check route
 decksRouter.put(
   '/:id',
+  // this is not working because param.id is the user id, not the deck id
+  // so I can add another parameter, id-to-check, but that seems like it will break stuff
+  // what other solutions can I come up with?
+  addIdParamUser,
+  isSuperOrUserItself, // todo: correct order?
   body('name').not().isEmpty(),
   updateDeck
-)
-decksRouter.delete('/:id', deleteDeck)
+) 
+decksRouter.delete('/:id', deleteDeck) // todo: check route
 
 decksRouter.post(
   '/:id/cards',
@@ -104,6 +114,6 @@ decksRouter.post(
   body('backImage').isURL(),
   body('backText').not().isEmpty(),
   createCard
-)
+) // todo: check route
 
 export default decksRouter
