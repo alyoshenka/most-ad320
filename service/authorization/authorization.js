@@ -42,7 +42,7 @@ export async function isAdmin(req, res, next) {
         }
     } catch (err) {
         console.log(`Error checking for admin: ${err}`)
-        res.sendStatus(500) // todo: correct status code?
+        res.sendStatus(500)
     }   
 }
 
@@ -58,7 +58,7 @@ export async function isSuperuser(req, res, next) {
         }
     } catch (err) {
         console.log(`Error checking for superuser: ${err}`)
-        res.sendStatus(500) // todo: correct status code?
+        res.sendStatus(500)
     }
 }
 
@@ -74,7 +74,7 @@ export async function isUser(req, res, next) {
         }
     } catch (err) {
         console.log(`Error checking for user: ${err}`)
-        res.sendStatus(500) // todo: correct status code?
+        res.sendStatus(500)
     }
 }
 
@@ -82,12 +82,14 @@ export async function isAdminOrSuperItself(req, res, next) {
     const { userId } = req.user
     const toDeleteId = req.params.id
     if (!userId) {
-        console.log('no userId')
-        res.sendStatus(500) // todo: error code?
+        console.log(`${isAdminOrSuperItself.name}: no userId`)
+        res.sendStatus(400)
+        return
     }
     if (!toDeleteId) {
-        console.log('no id parameter')
-        res.sendStatus(500) // todo: correct error code?
+        console.log(`${isAdminOrSuperItself.name}: no id parameter`)
+        res.sendStatus(400)
+        return
     }
     try {
         const requestor = await User.findById(userId)
@@ -100,8 +102,8 @@ export async function isAdminOrSuperItself(req, res, next) {
             res.status(403).send('Forbidden')
         }
     } catch (err) {
-        console.log(`Error deleting user: ${err}`)
-        console.sendStatus(500) // todo: error code
+        console.log(`Error checking role of user: ${err}`)
+        res.sendStatus(500)
     }
 }
 
@@ -111,51 +113,27 @@ export async function isSuperOrUserItself(req, res, next) {
     const { userId } = req.user
     const paramId = req.params.id
     if (!userId) {
-        console.log('no userId')
-        res.sendStatus(500) // todo: error code?
+        console.log(`${isSuperOrUserItself.name}: no userId`)
+        res.sendStatus(400)
+        return
     }
     if (!paramId) {
-        console.log('no id parameter')
-        res.sendStatus(500) // todo: correct error code?
+        console.log(`${isSuperOrUserItself.name}: no id parameter`)
+        res.sendStatus(400)
+        return
     }
     try {
         const requestor = await User.findById(userId)
         const role = requestor.role[0]
-        console.log(role)
-        console.log(userId)
-        console.log('check: ' + req.idCheck)
         if (atOrAboveRole(role, 'superuser')) {
-            // next()
-            res.sendStatus(200)
+            next()
         } else if (atOrAboveRole(role, 'user') && userId === paramId) {
-            // next()
-            res.sendStatus(200)
+            next()
         } else {
             res.status(403).send('Forbidden')
         }
     } catch (err) {
         console.log(`Error checking user: ${err}`)
-        console.sendStatus(500) // todo: error code
+        res.sendStatus(500)
     }
-}
-
-export async function deckIdBelongsToUser(req, res, next) {
-
-}
-
-// I kind of like this one, it seems more extensible when dealing with users, decks, and cards
-export async function addIdToCheckParameter(req, res, next) {
-
-}
-export async function addIdParamCard(req, res, next) {
-    
-}
-export async function addIdParamDeck(req, res, next) {
-
-}
-export async function addIdParamUser(req, res, next) { 
-    const { userId } = req.user
-    const paramId = req.params.id
-    req.idCheck = paramId
-    next()
 }
