@@ -2,34 +2,33 @@ import express from 'express'
 import mongoose from 'mongoose'
 import cors from 'cors'
 
-import { router } from './routes/router.js'
+import decksRouter from './routers/decks.js'
+import usersRouter from './routers/users.js'
+import authRouter, { verifyToken } from './routers/auth.js'
 
 const app = express()
 const port = 8000
 
-const connectionString = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@notablecluster.sm4hi.mongodb.net/Notable?retryWrites=true&w=majority`
+// Connect to MongoDB
 
+const connectionString = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@notablecluster.sm4hi.mongodb.net/notable?retryWrites=true&w=majority`
 try {
-    await mongoose.connect(connectionString)
+  await mongoose.connect(connectionString)
 } catch (err) {
-    console.log('error ', err)
+  console.log('error ', err)
 }
 
-const exampleMiddleware = (req, res, next) => {
-    console.log('example middleware')
-    next()
-}
+// Middleware
 
 app.use(cors())
 app.use(express.json())
 
-app.use('/', router)
+// Routes
 
-app.get('/', (req, res) => {
-    res.send('hello world')
-})
+app.use('/auth', authRouter)
+app.use('/decks', verifyToken, decksRouter)
+app.use('/users', verifyToken, usersRouter)
 
 app.listen(port, () => {
-    console.log(`Example app listening on port ${port}`)
-    console.log(mongoose.connection.readyState === 1 ? "mongoose ready" : "mongoose not ready")
+  console.log(`Example app listening on port ${port}!`)
 })
