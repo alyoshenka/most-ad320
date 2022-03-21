@@ -16,7 +16,7 @@ const CreateFlashcard = ({ userId, deckId }) => {
 
   useEffect(() => {
     if (auth) {
-      axios.get(`http://localhost:8000/users/${auth.user}`, { headers: { authorization: `Bearer ${auth.token}` }}).then((response) => {
+      axios.get(`http://localhost:8000/users/${auth.user}`, { headers: { authorization: auth.token }}).then((response) => {
         const userDecks = response.data.decks.map((deck) => {
           return {
             id: deck._id,
@@ -65,10 +65,15 @@ const CreateFlashcard = ({ userId, deckId }) => {
     event.preventDefault()
     if (!formErrors.frontImage && !formErrors.frontText && !formErrors.backImage && !formErrors.backText) {
       try {
-        const response = await axios.post(`http://localhost:8000/decks/${deckId}/cards`, formValue, { headers: { authorization: `Bearer ${auth.token}`} })
+        const response = await axios.post(`http://localhost:8000/decks/${deckId}/cards`, formValue, { headers: { authorization: auth.token } })
       } catch (err) {
         alert("Submission failed!")
       }
+    } else {
+      console.log("frontImage: " + formErrors.frontImage)
+      console.log("frontText: " + formErrors.frontText)
+      console.log("backImage: " + formErrors.backImage)
+      console.log("backText: " + formErrors.backText)
     }
   }
 

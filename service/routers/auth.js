@@ -37,6 +37,7 @@ const register = async (req, res) => {
 }
 
 async function login(req, res) {
+  console.log('login')
   const validationResults = validationResult(req)
   if (!validationResults.isEmpty()) {
     console.log(`Validation failed ${validationResult}`)

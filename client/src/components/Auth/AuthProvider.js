@@ -12,7 +12,7 @@ const AuthProvider = ({ children }) => {
         try{
             const authResponse = await axios.post(
                 'http://localhost:8000/auth/login', 
-                { email: email, password: password }, 
+                { email: email, password: password  }, 
                 { 'content-type': 'application/json' }
             )
             const decoded = jwt(authResponse.data.token)
@@ -20,12 +20,25 @@ const AuthProvider = ({ children }) => {
             callback()
         } catch (err) {
             console.log(`Login error ${err}`)
-            // Assignment: what should we do if this fails?
+            alert('Login error, try again')
+            callback()
         }
     }
 
-    const register = (email, password, callback) => { 
-        // Assignment: how do we register someone?  
+    const register = async (email, password, firstName, lastName, callback) => { 
+        console.log("[Register]")     
+        try{
+            const regResponse = await axios.post(
+                'http://localhost:8000/auth/register', 
+                { email: email, password: password, firstName: firstName, lastName: lastName }, 
+                { 'content-type': 'application/json' }
+            )
+            callback(null)
+        } catch (err) {
+            console.log(`Registration error ${err}`)  
+            alert('Registration error, try again')           
+            callback('/register')
+        }
     }
 
     const authCtx = {

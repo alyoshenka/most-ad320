@@ -22,12 +22,11 @@ ReactDOM.render(
         <Topbar />
         <Routes>
           <Route path="/" element={<Welcome />} />
-          {/* Addignment: Add a route for /user to redirect to from Login */}
-          <Route path="/user" element={<User />} /> {/* should be protected */}
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/app" element={<Protected><App /></Protected>} />
           <Route path="/create" element={<Protected><CreateFlashcard /></Protected>} />
+          <Route path="/user" element={<Protected><User /></Protected>} /> 
         </Routes>
       </AuthProvider>
     </BrowserRouter>
